@@ -1,0 +1,8 @@
+TODOS
+=====
+
+[ ] Replace QListWidget with QListView
+[ ] Create a ItemDelegate for QListView
+[ ] Load and save data to SQL Database
+[ ] Add timer and notifications
+
