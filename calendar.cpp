@@ -6,6 +6,7 @@ Calendar::Calendar(QWidget *parent) : QWidget(parent), m_dateFormat("yyyy-MM-dd 
     initDatabase();
     m_listView = new QListView(this);
     m_listView->setModel(m_sqlTableModel);
+    m_listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_layout = new QHBoxLayout();
     m_layout->addWidget(m_listView);
     this->setLayout(m_layout);
