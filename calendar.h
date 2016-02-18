@@ -3,9 +3,15 @@
 
 #include <QObject>
 #include <QWidget>
-#include <QListWidget>
+#include <QListView>
 #include <QHBoxLayout>
 #include <QList>
+#include <QFile>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlTableModel>
+#include <QMessageBox>
+
 #include "event.h"
 #include "eventdialog.h"
 
@@ -14,6 +20,7 @@ class Calendar : public QWidget
     Q_OBJECT
 public:
     explicit Calendar(QWidget *parent = 0);
+    ~Calendar();
 
 public slots:
     void addEvent();
@@ -21,11 +28,14 @@ public slots:
     void removeEvent();
 
 private:
-    QListWidget* m_listWidget;
-    QHBoxLayout* m_layout;
-    QList<Event> m_eventList;
+    void initDatabase();
 
-    void updateListWidget();
+    QString m_dateFormat;
+    QSqlDatabase m_db;
+    QSqlTableModel* m_sqlTableModel;
+
+    QListView* m_listView;
+    QHBoxLayout* m_layout;
 };
 
 #endif // CALENDAR_H

@@ -1,12 +1,46 @@
 #include "calendar.h"
 #include <QDebug>
 
-Calendar::Calendar(QWidget *parent) : QWidget(parent)
+Calendar::Calendar(QWidget *parent) : QWidget(parent), m_dateFormat("yyyy-MM-dd HH:mm:ss")
 {
-    m_listWidget = new QListWidget(this);
+    initDatabase();
+    m_listView = new QListView(this);
+    m_listView->setModel(m_sqlTableModel);
     m_layout = new QHBoxLayout();
-    m_layout->addWidget(m_listWidget);
+    m_layout->addWidget(m_listView);
     this->setLayout(m_layout);
+}
+
+Calendar::~Calendar()
+{
+    if(m_db.isOpen())
+        m_db.close();
+}
+
+void Calendar::initDatabase()
+{
+    QFile dbFile("data.db");
+    if(dbFile.exists())
+    {
+        m_db = QSqlDatabase::addDatabase("QSQLITE");
+        m_db.setDatabaseName("data.db");
+        m_db.open();
+        qDebug() << "Database oppened.";
+    }
+    else
+    {
+        m_db = QSqlDatabase::addDatabase("QSQLITE");
+        m_db.setDatabaseName("data.db");
+        m_db.open();
+        QSqlQuery createTable(m_db);
+        createTable.exec("CREATE TABLE events(name TEXT NULL, description TEXT NULL, date_time DATETIME)");
+        qDebug() << "Database created.";
+    }
+
+    m_sqlTableModel = new QSqlTableModel(this, m_db);
+    m_sqlTableModel->setTable("events");
+    m_sqlTableModel->setSort(2, Qt::AscendingOrder);
+    m_sqlTableModel->select();
 }
 
 void Calendar::addEvent()
@@ -21,26 +55,41 @@ void Calendar::addEvent()
 
         if((!tmpEvent.name().isEmpty()) || (!tmpEvent.description().isEmpty()))
         {
-            m_eventList.push_back(tmpEvent);
-            qDebug() << "Pushed";
+            QSqlQueryModel check;
+            check.setQuery("SELECT * FROM events WHERE date_time='" + tmpEvent.dateTime().toString(m_dateFormat) + "'", m_db);
+            if(check.rowCount() == 0)
+            {
+                QSqlQuery insertion(m_db);
+                insertion.exec("INSERT INTO events(name, description, date_time) "
+                               "VALUES('" + tmpEvent.name() + "', '" + tmpEvent.description() + "', '" + tmpEvent.dateTime().toString(m_dateFormat) + "')");
+                qDebug() << "Pushed";
+                m_sqlTableModel->select();
+            }
+            else
+            {
+                //Item with this date already exists
+                QMessageBox::warning(this, tr("Calendar"), tr("Item with this date and time already exists."));
+            }
         }
-
-        updateListWidget();
     }
 }
 
 void Calendar::editEvent()
 {
-
-    int index = m_listWidget->currentIndex().row();
-    if(index < 0 || index >= m_eventList.size())
+    int row = m_listView->currentIndex().row();
+    if(row < 0 || row >= m_sqlTableModel->rowCount())
         return;
 
-    Event tmpEvent = m_eventList.at(index);
+    Event tmpEvent;
+    tmpEvent.setName(m_sqlTableModel->index(row, 0).data().toString());
+    tmpEvent.setDescription(m_sqlTableModel->index(row, 1).data().toString());
+    tmpEvent.setDateTime(QDateTime::fromString(m_sqlTableModel->index(row, 2).data().toString(), m_dateFormat));
 
     EventDialog dialog(this);
     dialog.setModal(true);
     dialog.setDefault(tmpEvent.name(), tmpEvent.description(), tmpEvent.dateTime().date(), tmpEvent.dateTime().time());
+
+    QString tempDate = tmpEvent.dateTime().toString(m_dateFormat);
 
     if(dialog.exec() == QDialog::Accepted)
     {
@@ -48,32 +97,26 @@ void Calendar::editEvent()
 
         if((!tmpEvent.name().isEmpty()) && (!tmpEvent.description().isEmpty()))
         {
-            m_eventList.removeAt(index);
-            m_eventList.push_back(tmpEvent);
+            QSqlQuery update_query(m_db);
+            update_query.exec("UPDATE events SET name='" + tmpEvent.name() + "', description='" + tmpEvent.description() + "', "
+                              "date_time='" + tmpEvent.dateTime().toString(m_dateFormat) + "' "
+                              "WHERE date_time='" + tempDate + "'");
+            qDebug() << "Edited";
+            m_sqlTableModel->select();
         }
-
-        updateListWidget();
     }
 }
 
 void Calendar::removeEvent()
 {
-    int index = m_listWidget->currentIndex().row();
-    if(index < 0 || index >= m_eventList.size())
+    int row = m_listView->currentIndex().row();
+    if(row < 0 || row >= m_sqlTableModel->rowCount())
         return;
 
-    m_eventList.removeAt(index);
+    QString date = m_sqlTableModel->index(row, 2).data().toString();
 
-    updateListWidget();
-}
-
-void Calendar::updateListWidget()
-{
-    m_listWidget->clear();
-    qSort(m_eventList);
-    foreach(Event e, m_eventList)
-    {
-        m_listWidget->addItem(e.name() + "\n" + e.dateTime().date().toString("dd-MM-yyyy") + " Godz: " + e.dateTime().time().toString("h:mm:ss") + "\n" + e.description());
-    }
-    qDebug() << "List contains " << m_listWidget->count() << " elements";
+    QSqlQuery remove_query(m_db);
+    remove_query.exec("DELETE FROM events WHERE date_time='" + date + "'");
+    qDebug() << "Removed";
+    m_sqlTableModel->select();
 }

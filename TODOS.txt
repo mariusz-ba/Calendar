@@ -1,8 +1,13 @@
 TODOS
 =====
 
-[ ] Replace QListWidget with QListView
+UPDATE 18.02.2016
+-----------------
+[*] Replace QListWidget with QListView
+[*] Load and save data to SQL Database
+
 [ ] Create a ItemDelegate for QListView
-[ ] Load and save data to SQL Database
 [ ] Add timer and notifications
+[ ] Add settings
+[ ] Add about dialog
 
