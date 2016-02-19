@@ -7,8 +7,15 @@ Calendar::Calendar(QWidget *parent) : QWidget(parent), m_dateFormat("yyyy-MM-dd 
     m_listView = new QListView(this);
     m_listView->setModel(m_sqlTableModel);
     m_listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    m_listDelegate = new ListDelegate();
+    m_listView->setItemDelegate(m_listDelegate);
+
     m_layout = new QHBoxLayout();
     m_layout->addWidget(m_listView);
+
+    connect(m_listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(editEventIndex(QModelIndex)));
+
     this->setLayout(m_layout);
 }
 
@@ -34,13 +41,13 @@ void Calendar::initDatabase()
         m_db.setDatabaseName("data.db");
         m_db.open();
         QSqlQuery createTable(m_db);
-        createTable.exec("CREATE TABLE events(name TEXT NULL, description TEXT NULL, date_time DATETIME)");
+        createTable.exec("CREATE TABLE events(empty_place TEXT NULL, name TEXT NULL, description TEXT NULL, date_time DATETIME)");
         qDebug() << "Database created.";
     }
 
     m_sqlTableModel = new QSqlTableModel(this, m_db);
     m_sqlTableModel->setTable("events");
-    m_sqlTableModel->setSort(2, Qt::AscendingOrder);
+    m_sqlTableModel->setSort(3, Qt::AscendingOrder);
     m_sqlTableModel->select();
 }
 
@@ -75,6 +82,11 @@ void Calendar::addEvent()
     }
 }
 
+void Calendar::editEventIndex(QModelIndex)
+{
+    editEvent();
+}
+
 void Calendar::editEvent()
 {
     int row = m_listView->currentIndex().row();
@@ -82,9 +94,9 @@ void Calendar::editEvent()
         return;
 
     Event tmpEvent;
-    tmpEvent.setName(m_sqlTableModel->index(row, 0).data().toString());
-    tmpEvent.setDescription(m_sqlTableModel->index(row, 1).data().toString());
-    tmpEvent.setDateTime(QDateTime::fromString(m_sqlTableModel->index(row, 2).data().toString(), m_dateFormat));
+    tmpEvent.setName(m_sqlTableModel->index(row, 1).data().toString());
+    tmpEvent.setDescription(m_sqlTableModel->index(row, 2).data().toString());
+    tmpEvent.setDateTime(QDateTime::fromString(m_sqlTableModel->index(row, 3).data().toString(), m_dateFormat));
 
     EventDialog dialog(this);
     dialog.setModal(true);
@@ -114,7 +126,7 @@ void Calendar::removeEvent()
     if(row < 0 || row >= m_sqlTableModel->rowCount())
         return;
 
-    QString date = m_sqlTableModel->index(row, 2).data().toString();
+    QString date = m_sqlTableModel->index(row, 3).data().toString();
 
     QSqlQuery remove_query(m_db);
     remove_query.exec("DELETE FROM events WHERE date_time='" + date + "'");

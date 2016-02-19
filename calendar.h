@@ -8,12 +8,13 @@
 #include <QList>
 #include <QFile>
 #include <QSqlDatabase>
-#include <QSqlQuery>
 #include <QSqlTableModel>
+#include <QSqlQuery>
 #include <QMessageBox>
 
 #include "event.h"
 #include "eventdialog.h"
+#include "listdelegate.h"
 
 class Calendar : public QWidget
 {
@@ -26,6 +27,7 @@ public slots:
     void addEvent();
     void editEvent();
     void removeEvent();
+    void editEventIndex(QModelIndex);
 
 private:
     void initDatabase();
@@ -33,6 +35,7 @@ private:
     QString m_dateFormat;
     QSqlDatabase m_db;
     QSqlTableModel* m_sqlTableModel;
+    ListDelegate* m_listDelegate;
 
     QListView* m_listView;
     QHBoxLayout* m_layout;

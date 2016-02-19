@@ -17,9 +17,11 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     calendar.cpp \
     event.cpp \
-    eventdialog.cpp
+    eventdialog.cpp \
+    listdelegate.cpp
 
 HEADERS  += mainwindow.h \
     calendar.h \
     event.h \
-    eventdialog.h
+    eventdialog.h \
+    listdelegate.h
