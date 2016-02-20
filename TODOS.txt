@@ -15,5 +15,3 @@ UPDATE 20.02.2016
 [*] Add about dialog
 [*] Add settings
 
-[ ] Add timer and notifications
-

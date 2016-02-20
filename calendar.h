@@ -11,6 +11,7 @@
 #include <QSqlTableModel>
 #include <QSqlQuery>
 #include <QMessageBox>
+#include <QTimer>
 
 #include "event.h"
 #include "eventdialog.h"
