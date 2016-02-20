@@ -3,6 +3,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    loadSettings();
     this->setWindowIcon(QIcon(":/img/Calendar.png"));
     calendar = new Calendar(this);
 
@@ -35,6 +36,12 @@ MainWindow::~MainWindow()
 {
 }
 
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+    saveSettings();
+    event->accept();
+}
+
 void MainWindow::about()
 {
     AboutDialog dl(this);
@@ -42,4 +49,21 @@ void MainWindow::about()
     dl.setFixedSize(dl.sizeHint());
     dl.setModal(true);
     dl.exec();
+}
+
+void MainWindow::loadSettings()
+{
+    QSettings settings("mariusz-ba", "Calendar");
+    QSize size = qvariant_cast<QSize>(settings.value("size", QSize(300, 400)));
+    QPoint position = qvariant_cast<QPoint>(settings.value("pos", QPoint(0, 0)));
+    resize(size);
+    move(position);
+}
+
+void MainWindow::saveSettings()
+{
+    QSettings settings("mariusz-ba", "Calendar");
+    settings.setValue("size", size());
+    settings.setValue("pos", pos());
+
 }

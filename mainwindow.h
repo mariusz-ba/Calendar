@@ -5,6 +5,8 @@
 #include <QMenuBar>
 #include <QMenu>
 #include <QAction>
+#include <QCloseEvent>
+#include <QSettings>
 
 #include "calendar.h"
 #include "aboutdialog.h"
@@ -16,6 +18,11 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void closeEvent(QCloseEvent *);
+
+private slots:
+    void loadSettings();
+    void saveSettings();
 
 public slots:
     void about();
