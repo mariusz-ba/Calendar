@@ -18,10 +18,15 @@ SOURCES += main.cpp\
     calendar.cpp \
     event.cpp \
     eventdialog.cpp \
-    listdelegate.cpp
+    listdelegate.cpp \
+    aboutdialog.cpp
 
 HEADERS  += mainwindow.h \
     calendar.h \
     event.h \
     eventdialog.h \
-    listdelegate.h
+    listdelegate.h \
+    aboutdialog.h
+
+RESOURCES += \
+    resources.qrc

@@ -5,7 +5,9 @@
 #include <QMenuBar>
 #include <QMenu>
 #include <QAction>
+
 #include "calendar.h"
+#include "aboutdialog.h"
 
 class MainWindow : public QMainWindow
 {
@@ -15,6 +17,9 @@ public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+    void about();
+
 private:
     Calendar* calendar;
     QMenu* menu;
@@ -22,6 +27,8 @@ private:
     QAction* m_actionEdit;
     QAction* m_actionRemove;
     QAction* m_actionExit;
+    QMenu* help_menu;
+    QAction* m_actionAbout;
 };
 
 #endif // MAINWINDOW_H
