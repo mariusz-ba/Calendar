@@ -10,7 +10,10 @@ UPDATE 19.02.2016
 -----------------
 [*] Create a ItemDelegate for QListView
 
+UPDATE 20.02.2016
+-----------------
+[*] Add about dialog
+
 [ ] Add timer and notifications
 [ ] Add settings
-[ ] Add about dialog
 
