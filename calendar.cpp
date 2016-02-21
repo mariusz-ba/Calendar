@@ -68,8 +68,12 @@ void Calendar::addEvent()
             if(check.rowCount() == 0)
             {
                 QSqlQuery insertion(m_db);
-                insertion.exec("INSERT INTO events(name, description, date_time) "
-                               "VALUES('" + tmpEvent.name() + "', '" + tmpEvent.description() + "', '" + tmpEvent.dateTime().toString(m_dateFormat) + "')");
+                insertion.prepare("INSERT INTO events(name, description, date_time) VALUES"
+                                  "(?,?,?)");
+                insertion.addBindValue(tmpEvent.name());
+                insertion.addBindValue(tmpEvent.description());
+                insertion.addBindValue(tmpEvent.dateTime().toString(m_dateFormat));
+                insertion.exec();
                 qDebug() << "Pushed";
                 m_sqlTableModel->select();
             }
@@ -111,9 +115,14 @@ void Calendar::editEvent()
         if((!tmpEvent.name().isEmpty()) && (!tmpEvent.description().isEmpty()))
         {
             QSqlQuery update_query(m_db);
-            update_query.exec("UPDATE events SET name='" + tmpEvent.name() + "', description='" + tmpEvent.description() + "', "
-                              "date_time='" + tmpEvent.dateTime().toString(m_dateFormat) + "' "
-                              "WHERE date_time='" + tempDate + "'");
+            update_query.prepare("UPDATE events SET "
+                                 "name=?, description=?, date_time=?"
+                                 "WHERE date_time=?");
+            update_query.addBindValue(tmpEvent.name());
+            update_query.addBindValue(tmpEvent.description());
+            update_query.addBindValue(tmpEvent.dateTime().toString(m_dateFormat));
+            update_query.addBindValue(tempDate);
+            update_query.exec();
             qDebug() << "Edited";
             m_sqlTableModel->select();
         }
@@ -129,7 +138,9 @@ void Calendar::removeEvent()
     QString date = m_sqlTableModel->index(row, 3).data().toString();
 
     QSqlQuery remove_query(m_db);
-    remove_query.exec("DELETE FROM events WHERE date_time='" + date + "'");
+    remove_query.prepare("DELETE FROM events WHERE date_time=?");
+    remove_query.addBindValue(date);
+    remove_query.exec();
     qDebug() << "Removed";
     m_sqlTableModel->select();
 }
