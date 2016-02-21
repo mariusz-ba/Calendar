@@ -1,3 +1,12 @@
+/********************************************************
+ *
+ * Calendar App
+ *
+ * Created by Mariusz Baran on 17.02.2016
+ * Copyright (c) 2016 Mariusz Baran. All rights reserved
+ *
+ ********************************************************/
+
 #include "mainwindow.h"
 #include <QApplication>
 
