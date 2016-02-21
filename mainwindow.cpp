@@ -30,6 +30,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_actionRemove, SIGNAL(triggered()), calendar, SLOT(removeEvent()));
     connect(m_actionExit, SIGNAL(triggered()), this, SLOT(close()));
     connect(m_actionAbout, SIGNAL(triggered()), this, SLOT(about()));
+
+    m_toolbar = new QToolBar(this);
+    m_toolbar->addActions({m_actionAdd, m_actionEdit, m_actionRemove});
+    addToolBar(m_toolbar);
 }
 
 MainWindow::~MainWindow()

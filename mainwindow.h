@@ -7,6 +7,7 @@
 #include <QAction>
 #include <QCloseEvent>
 #include <QSettings>
+#include <QToolBar>
 
 #include "calendar.h"
 #include "aboutdialog.h"
@@ -36,6 +37,7 @@ private:
     QAction* m_actionExit;
     QMenu* help_menu;
     QAction* m_actionAbout;
+    QToolBar* m_toolbar;
 };
 
 #endif // MAINWINDOW_H
