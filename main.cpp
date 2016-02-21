@@ -6,7 +6,6 @@
  * Copyright (c) 2016 Mariusz Baran. All rights reserved
  *
  ********************************************************/
-
  
 #include "mainwindow.h"
 #include <QApplication>
